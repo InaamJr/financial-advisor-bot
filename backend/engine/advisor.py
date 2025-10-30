@@ -1,5 +1,5 @@
 import pandas as pd
-from engine.explainer import natural_language_explanation  # ✅ Using Option A (non-LLM) explanation
+from engine.explainer import natural_language_explanation  # Using Option A (non-LLM) explanation
 
 def generate_advice(df: pd.DataFrame, symbol: str = "AAPL") -> str:
     """
@@ -13,15 +13,15 @@ def generate_advice(df: pd.DataFrame, symbol: str = "AAPL") -> str:
     - Formatted natural language advice
     """
 
-    # ✅ Validate input DataFrame
+    # Validate input DataFrame
     if df.empty or 'signal' not in df.columns:
         return f"[ERROR] No valid data to generate advice for {symbol}."
 
-    # ✅ Extract latest signal row
+    # Extract latest signal row
     latest = df.iloc[-1]
     signal = int(latest['signal'])
 
-    # ✅ Determine action type
+    # Determine action type
     if signal == 1:
         action = "BUY"
     elif signal == -1:
@@ -29,7 +29,7 @@ def generate_advice(df: pd.DataFrame, symbol: str = "AAPL") -> str:
     else:
         action = "HOLD"
 
-    # ✅ Use our own natural explanation generator
+    # Use our own natural explanation generator
     explanation = natural_language_explanation(
         signal=action,
         short_ma=latest['sma_short'],
@@ -37,5 +37,5 @@ def generate_advice(df: pd.DataFrame, symbol: str = "AAPL") -> str:
         symbol=symbol
     )
 
-    # ✅ Return combined message
-    return f"📢 Recommendation: {action} {symbol.upper()}\n\n🧠 {explanation}"
+    # Return combined message
+    return f"📢 Recommendation: {action} {symbol.upper()}\n\n {explanation}"

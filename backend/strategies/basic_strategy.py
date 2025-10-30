@@ -19,21 +19,21 @@ def apply_moving_average_strategy(df: pd.DataFrame, short_window=10, long_window
 
     df = df.copy()
 
-    # ✅ Format the date if present
+    # Format the date if present
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
 
-    # ✅ Calculate short and long MAs
+    # Calculate short and long MAs
     df['sma_short'] = df['close'].rolling(window=short_window, min_periods=1).mean().round(2)
     df['sma_long'] = df['close'].rolling(window=long_window, min_periods=1).mean().round(2)
 
-    # ✅ Generate trading signal
+    # Generate trading signal
     df['signal'] = df.apply(
         lambda row: 1 if row['sma_short'] > row['sma_long'] else (-1 if row['sma_short'] < row['sma_long'] else 0),
         axis=1
     )
 
-    # ✅ Add signal strength (difference between SMAs)
+    # Add signal strength (difference between SMAs)
     df['signal_strength'] = (df['sma_short'] - df['sma_long']).abs().round(2)
 
     return df

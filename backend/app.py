@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # ✅ Allow all origins temporarily for dev
+CORS(app)  # Allow all origins temporarily for dev
 
 # If you want to restrict in production, use:
 # CORS(app, resources={r"/advice": {"origins": "http://localhost:5173"}})
@@ -18,18 +18,18 @@ def get_advice():
     data = request.get_json()
     symbol = data.get("symbol", "").upper().strip()
 
-    # ✅ Fix Yahoo-style symbols (e.g., BRK-B → BRK.B)
+    # Fix Yahoo-style symbols (e.g., BRK-B → BRK.B)
     if symbol == "BRK-B":
         symbol = "BRK.B"
 
-    # ✅ Reject malformed inputs
+    # Reject malformed inputs
     if not symbol or not (symbol.replace(".", "").isalpha() and len(symbol) <= 10):
         return jsonify({"message": f"'{symbol}' is not a valid stock symbol."}), 400
 
     try:
         stock_df = get_stock_data(symbol, period="6mo")
 
-        # ✅ Check if stock data exists
+        # Check if stock data exists
         if stock_df.empty or 'close' not in stock_df.columns:
             return jsonify({"message": f"No valid stock data found for {symbol}."}), 404
 
@@ -62,20 +62,20 @@ def evaluate_strategy():
         return jsonify({"message": "No symbol provided."}), 400
 
     try:
-        # 🧪 Step 1: Fetch data
+        # Step 1: Fetch data
         stock_df = get_stock_data(symbol, period="6mo")
         print(f"[DEBUG] Fetched data for {symbol}, shape: {stock_df.shape}")
 
-        # 🧪 Step 2: Apply strategy
+        # Step 2: Apply strategy
         stock_df = apply_moving_average_strategy(stock_df)
         print(f"[DEBUG] After strategy applied, columns: {stock_df.columns.tolist()}")
 
-        # ❗ Check if signals are available
+        # Check if signals are available
         if stock_df.empty or 'signal' not in stock_df.columns:
             print(f"[DEBUG] No usable signals found for {symbol}. Sample:\n{stock_df.head()}")
             return jsonify({"message": "No signal data available."}), 204
 
-        # 🧪 Step 3: Run backtest
+        # Step 3: Run backtest
         print(f"[DEBUG] Running backtest for {symbol}...")
         summary, trades, equity = backtest_strategy(stock_df)
 
